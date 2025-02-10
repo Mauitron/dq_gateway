@@ -1,0 +1,59 @@
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+the gateway should allow/disallow incomming transmissions.
+it should be quick, performance and load tolerans seem key.
+it should sort and distribute the incomming data to where it is supposed to go.
+security is important. 
+no compression or removing of data on the transmission in the gateway. 
+
+things we might need to do to improve performance
+1. could we short circut on length?
+2. should we check for a complete preamble, and then the datafield to confirm length, and then confirm the package?
+   this would be two short circut opportunities, maybe.
+3. we should not transform the data unless we absolutly need to. there is no reason
+   to convert the binary to human readable information when it can be stored in a way
+   that is. it would also be more efficient to have a translation layer when viewing or
+   manipulating the data, rather than doing that computation upfront. 
+
+The best approach might be to create a bitmask that the gateway uses to confirm package validity.
+this way we don't need to calculate anything, just compare two binary sequences. 
+Maybe this could be done by a sliding window approch, could we create a sequence that would result
+in a predictable pattern when it moves across the package? Sliding windows can be expensive though.
+
+Another way parsing the data might be to use 'known' points in the sequence and only continue
+processing the package each time it succeeds in satisfying the pattern we are looking for.
+although, this most would most likely be slow, due to the calls being made. 
+
+So, we want to reduce instructions needed, we need accuracy, but we should try to avoid
+computing the data in any complex way. simple comparisons or infered computation would
+increase the potential for  a higher load capacity. 
+
+a package will enter the gateway, it is likely to be sent to multiple locations. 
+How do we do this efficently? SIMD is a given, but would it be better to send echo it, or clone
+it? 
+
+Syncing the package. how is it failing today? by following the data field, we should
+be able to confirm the order, because each avl packet has a known structure.
+
+                             Our ideas and possible solutions. 
+1.  Structure the process to take advantage of SIMD.
+2.  Can we logicaly seperate work to eliminate the need for queues, or can we make each individual queue concurrent?.
+3.  should we consolidate data into a more centeralized structure?
+4.  avoid transforming the data unless absolutely necessery. would it be a bad idea to feed the database directly? 
+5.  should look into the benefits of parallelizig the gateway?
+6.  would the gateway benefit from batch processing?
+7.  look into creating a bitmask for validating the packets.
+8.  could we make use of bitwise operations to either validate or organize the data?
+9.  Take time an try and find opportunities for short curcuiting the operations.
+10. Maybe there is things we can take advantage of using this approach to offload other parts of the system.
+    like sorting, memory usage, or make communication between the different parts more efficient? maybe it would be beneficial to mark the data comming in.
+11. Is there benefits to maybe using a diff approach to some things. maybe the gateway could be given a small amount of memory for bool storage,
+    only reporting back to the backend when a bool is switched. for sleep ping and similar yes or no checks.
+12. should the gateway be a small statefull datastructure, meaning its state is perserved if something goes wrong? if yes, it will be impotant to structure this to fit
+    the protocol data very closely. we also need to set a size limit. and we need to flush the structure after each finished package. will it be efficient?
+    It is important to highlight that a statefull structure has memory of events through time, the amount of states it can remember is highly dependant on the unique states
+    the structure can have. 
+13. 
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
